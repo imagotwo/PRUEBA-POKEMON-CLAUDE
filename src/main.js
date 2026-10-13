@@ -60,32 +60,60 @@ subBtnWeak.addEventListener("change", ()=>{
     printPokemons(filterWeakness);
 })
 
+//Función que devuelve los nombres de las evoluciones o "None" si no tiene
+function evolutionNames(evolutions) {
+    return evolutions ? evolutions.map(pokemonEvo => pokemonEvo.name).join(", ") : "None";
+}
+
 //llamando y guardando la data en nodos creados (tarjeta) para interacción del DOM función pokemonCard
+//La tarjeta tiene dos caras: el frente (nombre, número, imagen, tipo) y el reverso con la información,
+//que se muestra al girar la tarjeta cuando el cursor pasa por encima
 function pokemonCard(pokemon) {
     const container = document.createElement("div");
+    const cardInner = document.createElement("div");
+    const cardFront = document.createElement("div");
+    const cardBack = document.createElement("div");
     const pokemonNameCont = document.createElement("div");
     const pokemonTypeCount = document.createElement("div");
-    
+
     const titleCard = document.createElement("h2");
     titleCard.innerHTML=`${pokemon.name}`;
     pokemonNameCont.appendChild(titleCard);
-    container.appendChild(pokemonNameCont);
+    cardFront.appendChild(pokemonNameCont);
 
     const number = document.createElement("p");
     number.innerHTML =`${pokemon.num}`;
-    container.appendChild(pokemonNameCont);
     pokemonNameCont.appendChild(number);
 
     const image = document.createElement("img");
     image.src= `${pokemon.img}`;
-    container.appendChild(image);
+    cardFront.appendChild(image);
 
     const type =document.createElement("span");
     type.innerHTML =`${pokemon.type}`;
-    container.appendChild(pokemonTypeCount);
+    cardFront.appendChild(pokemonTypeCount);
     pokemonTypeCount.appendChild(type);
 
+    //Reverso de la tarjeta con la información del pokémon
+    cardBack.innerHTML =
+    `<div class="pokemonName"><h2>${pokemon.name}</h2><p class="pokemonsNumber">${pokemon.num}</p></div>
+    <div class="cardBackInfo">
+        <p>Type: <span>${pokemon.type.join(", ")}</span></p>
+        <p>Weaknesses: <span>${pokemon.weaknesses.join(", ")}</span></p>
+        <p>Height: <span>${pokemon.height}</span> · Weight: <span>${pokemon.weight}</span></p>
+        <p>Candy count: <span>${pokemon.candy_count || "-"}</span></p>
+        <p>Pre-evolution: <span>${evolutionNames(pokemon.prev_evolution)}</span></p>
+        <p>Evolution: <span>${evolutionNames(pokemon.next_evolution)}</span></p>
+    </div>`;
+
+    cardInner.appendChild(cardFront);
+    cardInner.appendChild(cardBack);
+    container.appendChild(cardInner);
+
     container.setAttribute("class", "pokemonsCard");
+    cardInner.setAttribute("class", "cardInner");
+    cardFront.setAttribute("class", "cardFace cardFront");
+    cardBack.setAttribute("class", "cardFace cardBack");
     pokemonNameCont.setAttribute("class", "pokemonName" );
     number.setAttribute("class", "pokemonsNumber")
     image.setAttribute("class", "pokemonImage");
@@ -100,21 +128,8 @@ function pokemonCard(pokemon) {
 function pokemonInfo (pokemon) {
     root.style.display = 'none';
     const infoCard = document.querySelector("#infoCard"); 
-    let evolution;
-    let preEvolution;
-        
-    //Implementación del método array.map para invocar y guardar las evoluciones en la data
-    if (pokemon.next_evolution) {
-        evolution = pokemon.next_evolution.map(pokemonEvo => 
-            pokemonEvo.name)
-    }
-    else{ evolution = "None"}
-
-    if (pokemon.prev_evolution) {
-        preEvolution = pokemon.prev_evolution.map(pokemonEvo => 
-       pokemonEvo.name)   
-    }   
-    else{ preEvolution = "None"}
+    const evolution = evolutionNames(pokemon.next_evolution);
+    const preEvolution = evolutionNames(pokemon.prev_evolution);
 
 //Generación del Template con el método innnerHTML
     infoCard.innerHTML =
